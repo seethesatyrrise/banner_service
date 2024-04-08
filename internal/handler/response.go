@@ -31,6 +31,10 @@ func responseErr(err error) *echo.HTTPError {
 		return echo.NewHTTPError(http.StatusConflict, err)
 	case utils.ErrBadRequest:
 		return echo.NewHTTPError(http.StatusBadRequest, err)
+	case utils.ErrAccessDenied:
+		return echo.NewHTTPError(http.StatusForbidden, err)
+	case utils.ErrNoAuthorization:
+		return echo.NewHTTPError(http.StatusUnauthorized, err)
 	default:
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}

@@ -17,9 +17,15 @@ type DB struct {
 	Password string `env:"DB_PASSWORD" env-default:"postgres"`
 }
 
+type Tokens struct {
+	User  string `env:"USER_TOKEN" env-default:"user_token"`
+	Admin string `env:"ADMIN_TOKEN" env-default:"admin_token"`
+}
+
 type Config struct {
 	HTTP
 	DB
+	Tokens
 }
 
 func New() (*Config, error) {

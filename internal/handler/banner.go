@@ -11,7 +11,11 @@ import (
 func (h *Handler) createBanner(ctx echo.Context) error {
 	var banner entity.Banner
 
-	//todo check token
+	err := h.checkUserAuthorization(ctx.Request().Header.Get("Authorization"))
+	if err != nil {
+		utils.Logger.Error("incorrect auth data", zap.String("error", err.Error()))
+		return err
+	}
 
 	if err := ctx.Bind(&banner); err != nil {
 		utils.Logger.Error("incorrect banner data", zap.String("error", err.Error()))

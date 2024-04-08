@@ -41,7 +41,7 @@ func New() (app *App, err error) {
 
 	repos := repo.New(app.db.DB)
 	services := service.New(repos)
-	handlers := handler.New(services)
+	handlers := handler.New(services, &app.cfg.Tokens)
 
 	handlers.Route(app.router)
 
