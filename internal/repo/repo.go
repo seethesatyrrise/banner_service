@@ -15,7 +15,7 @@ type Banner interface {
 }
 
 type UserBanner interface {
-	//GetBanner(ctx context.Context, ) (int, error)
+	GetBanner(ctx context.Context, tagId, featureId int) ([]byte, error)
 }
 
 type Repository struct {

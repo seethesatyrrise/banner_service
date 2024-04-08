@@ -17,3 +17,9 @@ type BannerRelationsToDB struct {
 	FeatureId int `db:"feature_id"`
 	BannerId  int `db:"banner_id"`
 }
+
+type UserBanner struct {
+	TagId           int  `query:"tag_id"`
+	FeatureId       int  `query:"feature_id"`
+	UseLastRevision bool `query:"use_last_revision"`
+}

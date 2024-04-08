@@ -7,7 +7,7 @@ create table banners
     updated_at timestamp    not null default now()
 );
 
-create table feature_tag_banners
+create table banners_relations
 (
     id         serial primary key,
     tag_id    integer       not null,

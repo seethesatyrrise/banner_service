@@ -28,7 +28,7 @@ type Banner interface {
 }
 
 type UserBanner interface {
-	//GetBanner(ctx context.Context, ) (int, error)
+	GetBanner(ctx context.Context, banner entity.UserBanner) (map[string]interface{}, error)
 }
 
 type Service struct {

@@ -22,8 +22,8 @@ func New(services *service.Service, tokens *config.Tokens) *Handler {
 }
 
 func (h *Handler) Route(e *echo.Echo) {
-	//userBanner := e.Group("/user_banner")
-	//userBanner.GET("/", h.getBanner)
+	userBanner := e.Group("/user_banner")
+	userBanner.GET("/", h.getBanner)
 
 	banner := e.Group("/banner")
 	//banner.GET("/", h.filterBanners)

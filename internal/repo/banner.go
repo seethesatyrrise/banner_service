@@ -41,7 +41,7 @@ func (r *BannerRepo) AddBannerRelations(ctx context.Context, bannerRelations []e
 		return errors.Wrap(err, fmt.Sprintf("BannerRepo.AddBannerRelations: %s", err.Error()))
 	}
 
-	bannerRelationsQuery := "INSERT INTO feature_tag_banners (tag_id, feature_id, banner_id) VALUES (:tag_id, :feature_id, :banner_id)"
+	bannerRelationsQuery := "INSERT INTO banners_relations (tag_id, feature_id, banner_id) VALUES (:tag_id, :feature_id, :banner_id)"
 
 	res, err := r.db.NamedExecContext(ctx, bannerRelationsQuery, bannerRelations)
 	if err != nil {
