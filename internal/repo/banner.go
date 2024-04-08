@@ -54,3 +54,38 @@ func (r *BannerRepo) AddBannerRelations(ctx context.Context, bannerRelations []e
 
 	return tx.Commit()
 }
+
+func (r *BannerRepo) DeleteBanner(ctx context.Context, id int) error {
+	tx, err := r.db.Begin()
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("BannerRepo.DeleteBanner: %s", err.Error()))
+	}
+
+	deleteRelationsQuery := `DELETE FROM banners_relations WHERE banner_id = $1`
+
+	res, err := tx.ExecContext(ctx, deleteRelationsQuery, id)
+	if err != nil {
+		tx.Rollback()
+		return errors.Wrap(err, fmt.Sprintf("BannerRepo.DeleteBanner: %s", err.Error()))
+	}
+
+	rowsDeleted, _ := res.RowsAffected()
+	utils.Logger.Info(fmt.Sprintf("BannerRepo.DeleteBanner: delete %d rows from banners relations table", rowsDeleted))
+
+	deleteQuery := `DELETE FROM banners WHERE id = $1;`
+
+	res, err = tx.ExecContext(ctx, deleteQuery, id)
+	if err != nil {
+		tx.Rollback()
+		return errors.Wrap(err, fmt.Sprintf("BannerRepo.DeleteBanner: %s", err.Error()))
+	}
+
+	rowsDeleted, _ = res.RowsAffected()
+	if rowsDeleted == 0 {
+		tx.Rollback()
+		return errors.Wrap(utils.ErrNotFound, fmt.Sprintf("BannerRepo.DeleteBanner: no banners for id %d", id))
+	}
+	utils.Logger.Info(fmt.Sprintf("BannerRepo.DeleteBanner: delete %d rows from banners table", rowsDeleted))
+
+	return tx.Commit()
+}

@@ -24,7 +24,7 @@ type Banner interface {
 	CreateBanner(ctx context.Context, banner entity.Banner) (int, error)
 	//FilterBanners() ()
 	//UpdateBanner() ()
-	//DeleteBanner() ()
+	DeleteBanner(ctx context.Context, id int) error
 }
 
 type UserBanner interface {

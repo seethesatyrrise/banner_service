@@ -46,3 +46,7 @@ func (s *BannerService) CreateBanner(ctx context.Context, banner entity.Banner) 
 
 	return bannerId, err
 }
+
+func (s *BannerService) DeleteBanner(ctx context.Context, id int) error {
+	return s.repo.DeleteBanner(ctx, id)
+}

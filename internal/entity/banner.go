@@ -23,3 +23,7 @@ type UserBanner struct {
 	FeatureId       int  `query:"feature_id"`
 	UseLastRevision bool `query:"use_last_revision"`
 }
+
+type BannerId struct {
+	Id int `param:"id"`
+}

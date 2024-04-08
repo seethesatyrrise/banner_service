@@ -11,7 +11,7 @@ type Banner interface {
 	AddBannerRelations(ctx context.Context, bannerRelations []entity.BannerRelationsToDB) error
 	//FilterBanners() ()
 	//UpdateBanner() ()
-	//DeleteBanner() ()
+	DeleteBanner(ctx context.Context, id int) error
 }
 
 type UserBanner interface {
