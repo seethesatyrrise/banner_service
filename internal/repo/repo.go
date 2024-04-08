@@ -7,7 +7,8 @@ import (
 )
 
 type Banner interface {
-	CreateBanner(ctx context.Context, banner entity.Banner) (int, error)
+	AddBanner(ctx context.Context, banner entity.BannerToDB) (int, error)
+	AddBannerRelations(ctx context.Context, bannerRelations []entity.BannerRelationsToDB) error
 	//FilterBanners() ()
 	//UpdateBanner() ()
 	//DeleteBanner() ()
