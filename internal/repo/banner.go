@@ -27,7 +27,7 @@ func (r *BannerRepo) CreateBanner(ctx context.Context, banner entity.Banner) (in
 
 	bannerQuery := `INSERT INTO banners (content, tag_ids, feature_id, is_active) 
 					VALUES ($1, $2, $3, $4)
-					RETURNING id`
+					RETURNING banner_id`
 	row := r.db.QueryRowContext(ctx, bannerQuery, content, pq.Array(banner.TagIds), banner.FeatureId, banner.IsActive)
 
 	var bannerId int
@@ -39,7 +39,7 @@ func (r *BannerRepo) CreateBanner(ctx context.Context, banner entity.Banner) (in
 }
 
 func (r *BannerRepo) DeleteBanner(ctx context.Context, id int) error {
-	deleteQuery := `DELETE FROM banners WHERE id = $1;`
+	deleteQuery := `DELETE FROM banners WHERE banner_id = $1;`
 
 	res, err := r.db.ExecContext(ctx, deleteQuery, id)
 	if err != nil {
@@ -53,4 +53,43 @@ func (r *BannerRepo) DeleteBanner(ctx context.Context, id int) error {
 	utils.Logger.Info(fmt.Sprintf("BannerRepo.DeleteBanner: delete %d rows from banners table", rowsDeleted))
 
 	return nil
+}
+
+func (r *BannerRepo) FilterBanners(ctx context.Context, params entity.BannerFilters) ([]entity.BannerInfo, error) {
+
+	filterQuery := `SELECT *  FROM banners
+					WHERE ($1 = 0 OR $1 = ANY (tag_ids)) AND ($2 = 0 OR $2 = feature_id)
+					LIMIT (CASE WHEN $3 > 0 THEN $3 END) OFFSET $4`
+
+	rows, err := r.db.QueryContext(ctx, filterQuery, params.TagId, params.FeatureId, params.Limit, params.Offset)
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("BannerRepo.FilterBanners: %s", err.Error()))
+	}
+
+	banners := []entity.BannerInfo{}
+	for rows.Next() {
+		banner := entity.BannerInfo{}
+		content := entity.BannerContent{}
+
+		err = rows.Scan(&banner.BannerId, &content.Content, pq.Array(&banner.TagIds), &banner.FeatureId, &banner.IsActive,
+			&banner.CreatedAt, &banner.UpdatedAt)
+		if err != nil {
+			utils.Logger.Error(fmt.Sprintf("BannerRepo.FilterBanners: %s", err.Error()))
+			break
+		}
+
+		err = json.Unmarshal(content.Content, &banner.Content)
+		if err != nil {
+			utils.Logger.Error(fmt.Sprintf("BannerRepo.FilterBanners: %s", err.Error()))
+			continue
+		}
+
+		banners = append(banners, banner)
+	}
+
+	if err = rows.Close(); err != nil {
+		return nil, err
+	}
+
+	return banners, nil
 }

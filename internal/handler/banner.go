@@ -50,7 +50,7 @@ func (h *Handler) deleteBanner(ctx echo.Context) error {
 		return responseErr(errors.Wrap(utils.ErrBadRequest, "incorrect data"))
 	}
 
-	err = h.services.DeleteBanner(ctx.Request().Context(), bannerId.Id)
+	err = h.services.DeleteBanner(ctx.Request().Context(), bannerId.BannerId)
 	if err != nil {
 		utils.Logger.Error("banner deletion error", zap.String("error", err.Error()))
 		return responseErr(err)
@@ -66,7 +66,7 @@ func (h *Handler) filterBanners(ctx echo.Context) error {
 		return err
 	}
 
-	queryParams := make(map[string]int, 4)
+	var queryParams entity.BannerFilters
 
 	if err := ctx.Bind(&queryParams); err != nil {
 		utils.Logger.Error("incorrect data", zap.String("error", err.Error()))
@@ -79,5 +79,5 @@ func (h *Handler) filterBanners(ctx echo.Context) error {
 		return responseErr(err)
 	}
 
-	return responseDeleted(ctx, bannersInfo)
+	return responseOk(ctx, bannersInfo)
 }

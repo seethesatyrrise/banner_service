@@ -8,7 +8,7 @@ import (
 
 type Banner interface {
 	CreateBanner(ctx context.Context, banner entity.Banner) (int, error)
-	//FilterBanners(ctx context.Context, params map[string]int) ([]entity.BannerInfo, error)
+	FilterBanners(ctx context.Context, params entity.BannerFilters) ([]entity.BannerInfo, error)
 	//UpdateBanner() ()
 	DeleteBanner(ctx context.Context, id int) error
 }
