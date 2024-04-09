@@ -16,14 +16,14 @@ func (h *Handler) getBanner(ctx echo.Context) error {
 	}
 	var banner entity.UserBanner
 
-	if ctx.QueryParam("tag_id") == "" || ctx.QueryParam("feature_id") == "" {
-		utils.Logger.Error("incorrect banner data, missing tag or feature")
-		return responseErr(errors.Wrap(utils.ErrBadRequest, "incorrect banner data, missing tag or feature"))
-	}
-
 	if err := ctx.Bind(&banner); err != nil {
 		utils.Logger.Error("incorrect banner data", zap.String("error", err.Error()))
 		return responseErr(errors.Wrap(utils.ErrBadRequest, "incorrect banner data"))
+	}
+
+	if banner.FeatureId == 0 || banner.TagId == 0 {
+		utils.Logger.Error("incorrect banner data, missing tag or feature")
+		return responseErr(errors.Wrap(utils.ErrBadRequest, "incorrect banner data, missing tag or feature"))
 	}
 
 	result, err := h.services.GetBanner(ctx.Request().Context(), banner)

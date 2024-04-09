@@ -58,3 +58,26 @@ func (h *Handler) deleteBanner(ctx echo.Context) error {
 
 	return responseDeleted(ctx, "banner was deleted")
 }
+
+func (h *Handler) filterBanners(ctx echo.Context) error {
+	err := h.checkAdminAuthorization(ctx.Request().Header.Get("Authorization"))
+	if err != nil {
+		utils.Logger.Error("incorrect auth data", zap.String("error", err.Error()))
+		return err
+	}
+
+	queryParams := make(map[string]int, 4)
+
+	if err := ctx.Bind(&queryParams); err != nil {
+		utils.Logger.Error("incorrect data", zap.String("error", err.Error()))
+		return responseErr(errors.Wrap(utils.ErrBadRequest, "incorrect data"))
+	}
+
+	bannersInfo, err := h.services.FilterBanners(ctx.Request().Context(), queryParams)
+	if err != nil {
+		utils.Logger.Error("banner filtration error", zap.String("error", err.Error()))
+		return responseErr(err)
+	}
+
+	return responseDeleted(ctx, bannersInfo)
+}

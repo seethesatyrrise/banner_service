@@ -26,7 +26,7 @@ func (h *Handler) Route(e *echo.Echo) {
 	userBanner.GET("/", h.getBanner)
 
 	banner := e.Group("/banner")
-	//banner.GET("/", h.filterBanners)
+	banner.GET("/", h.filterBanners)
 	banner.POST("/", h.createBanner)
 	//banner.PATCH("/:id", h.updateBanner)
 	banner.DELETE("/:id", h.deleteBanner)

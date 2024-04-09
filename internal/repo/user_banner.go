@@ -18,11 +18,8 @@ func NewUserBanner(db *sqlx.DB) *UserBannerRepo {
 }
 
 func (r *UserBannerRepo) GetBanner(ctx context.Context, tagId, featureId int) ([]byte, error) {
-	bannerQuery := `SELECT b.content FROM banners as b 
-    			INNER JOIN banners_relations as br ON b.id = br.banner_id 
-                 WHERE br.tag_id = $1 AND br.feature_id = $2 AND b.is_active 
-                 ORDER BY br.updated_at DESC LIMIT 1`
-	row := r.db.QueryRowContext(ctx, bannerQuery, tagId, featureId)
+	bannerQuery := `SELECT content FROM banners WHERE feature_id = $1 AND $2 = ANY (tag_ids)`
+	row := r.db.QueryRowContext(ctx, bannerQuery, featureId, tagId)
 
 	var content []byte
 	err := row.Scan(&content)

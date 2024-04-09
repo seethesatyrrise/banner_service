@@ -1,10 +1,12 @@
 package entity
 
+import "time"
+
 type Banner struct {
-	TagIds    []int                  `json:"tag_ids"`
-	FeatureId int                    `json:"feature_id"`
-	Content   map[string]interface{} `json:"content"`
-	IsActive  bool                   `json:"is_active"`
+	TagIds    []int                  `json:"tag_ids" db:"tag_ids"`
+	FeatureId int                    `json:"feature_id" db:"feature_id"`
+	Content   map[string]interface{} `json:"content" db:"content"`
+	IsActive  bool                   `json:"is_active" db:"is_active"`
 }
 
 type BannerToDB struct {
@@ -26,4 +28,14 @@ type UserBanner struct {
 
 type BannerId struct {
 	Id int `param:"id"`
+}
+
+type BannerInfo struct {
+	BannerId  int                    `json:"banner_id"`
+	TagIds    []int                  `json:"tag_ids"`
+	FeatureId int                    `json:"feature_id"`
+	Content   map[string]interface{} `json:"content"`
+	IsActive  bool                   `json:"is_active"`
+	CreatedAt time.Time              `json:"created_at"`
+	UpdatedAt time.Time              `json:"updated_at"`
 }
