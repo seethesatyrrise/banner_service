@@ -1,6 +1,7 @@
 package app
 
 import (
+	"bannerService/internal/cache"
 	"bannerService/internal/config"
 	"bannerService/internal/database"
 	"bannerService/internal/handler"
@@ -15,6 +16,7 @@ import (
 
 type App struct {
 	db     *database.DB
+	cache  *cache.Cache
 	router *echo.Echo
 	cfg    *config.Config
 }
@@ -35,12 +37,14 @@ func New() (app *App, err error) {
 		return nil, errors.Wrap(err, "database connection err")
 	}
 
+	app.cache = cache.New()
+
 	log.Info("database connected")
 
 	app.router = echo.New()
 
 	repos := repo.New(app.db.DB)
-	services := service.New(repos)
+	services := service.New(repos, app.cache)
 	handlers := handler.New(services, &app.cfg.Tokens)
 
 	handlers.Route(app.router)

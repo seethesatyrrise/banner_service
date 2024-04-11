@@ -22,6 +22,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_started
 
   postgres:
     container_name: postgres
@@ -41,3 +43,14 @@ services:
       - ./postgres:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+
+  redis:
+    container_name: redis
+    image: "redis:alpine"
+    expose:
+      - "6379"
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis-cache:/data
+    restart: on-failure

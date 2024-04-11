@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bannerService/internal/cache"
 	"bannerService/internal/entity"
 	"bannerService/internal/repo"
 	"context"
@@ -30,10 +31,10 @@ type Service struct {
 	BannerHistory
 }
 
-func New(repo *repo.Repository) *Service {
+func New(repo *repo.Repository, cache *cache.Cache) *Service {
 	return &Service{
 		Banner:        NewBannerService(repo),
-		UserBanner:    NewUserBannerService(repo),
+		UserBanner:    NewUserBannerService(repo, cache),
 		BannerHistory: NewBannerHistoryService(repo),
 	}
 }
