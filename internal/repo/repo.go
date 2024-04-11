@@ -17,14 +17,20 @@ type UserBanner interface {
 	GetBanner(ctx context.Context, tagId, featureId int) ([]byte, error)
 }
 
+type BannerHistory interface {
+	GetBannerHistory(ctx context.Context, id int) (entity.BannerHistory, error)
+}
+
 type Repository struct {
 	Banner
 	UserBanner
+	BannerHistory
 }
 
 func New(db *sqlx.DB) *Repository {
 	return &Repository{
-		Banner:     NewBanner(db),
-		UserBanner: NewUserBanner(db),
+		Banner:        NewBanner(db),
+		UserBanner:    NewUserBanner(db),
+		BannerHistory: NewBannerHistory(db),
 	}
 }

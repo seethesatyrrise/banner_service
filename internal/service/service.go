@@ -19,14 +19,20 @@ type UserBanner interface {
 	GetBanner(ctx context.Context, banner entity.UserBanner) (map[string]interface{}, error)
 }
 
+type BannerHistory interface {
+	GetBannerHistory(ctx context.Context, id int) (entity.BannerHistory, error)
+}
+
 type Service struct {
 	Banner
 	UserBanner
+	BannerHistory
 }
 
 func New(repo *repo.Repository) *Service {
 	return &Service{
-		Banner:     NewBannerService(repo),
-		UserBanner: NewUserBannerService(repo),
+		Banner:        NewBannerService(repo),
+		UserBanner:    NewUserBannerService(repo),
+		BannerHistory: NewBannerHistoryService(repo),
 	}
 }

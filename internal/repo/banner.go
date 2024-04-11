@@ -108,11 +108,24 @@ func (r *BannerRepo) UpdateBanner(ctx context.Context, patch map[string]interfac
 		return errors.Wrap(err, fmt.Sprintf("BannerRepo.UpdateBanner: %s", err.Error()))
 	}
 
-	//todo add banner to history
+	tx, err := r.db.Begin()
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("BannerRepo.UpdateBanner: %s", err.Error()))
+	}
+
+	historyQuery := `INSERT INTO banners_history (banner_id, content, tag_ids, feature_id, is_active) 
+					VALUES ($1, $2, $3, $4, $5)`
+	_, err = tx.ExecContext(ctx, historyQuery, bannerId, oldBanner.Content, pq.Array(oldBanner.TagIds),
+		oldBanner.FeatureId, oldBanner.IsActive)
+	if err != nil {
+		tx.Rollback()
+		return errors.Wrap(err, fmt.Sprintf("BannerRepo.UpdateBanner: %s", err.Error()))
+	}
 
 	if content, ok := patch["content"]; ok {
 		contentJSON, err := json.Marshal(content)
 		if err != nil {
+			tx.Rollback()
 			return errors.Wrap(err, fmt.Sprintf("BannerRepo.UpdateBanner: %s", err.Error()))
 		}
 		oldBanner.Content = contentJSON
@@ -120,20 +133,23 @@ func (r *BannerRepo) UpdateBanner(ctx context.Context, patch map[string]interfac
 	}
 	patchJSON, err := json.Marshal(patch)
 	if err != nil {
+		tx.Rollback()
 		return errors.Wrap(err, fmt.Sprintf("BannerRepo.UpdateBanner: %s", err.Error()))
 	}
 
 	err = json.Unmarshal(patchJSON, &oldBanner)
 	if err != nil {
+		tx.Rollback()
 		return errors.Wrap(err, fmt.Sprintf("BannerRepo.UpdateBanner: %s", err.Error()))
 	}
 
 	bannerQuery := `UPDATE banners SET tag_ids = $1, feature_id = $2, content = $3, is_active = $4, updated_at = NOW() 
                		WHERE banner_id = $5`
-	_, err = r.db.ExecContext(ctx, bannerQuery, pq.Array(oldBanner.TagIds), oldBanner.FeatureId, oldBanner.Content, oldBanner.IsActive, bannerId)
+	_, err = tx.ExecContext(ctx, bannerQuery, pq.Array(oldBanner.TagIds), oldBanner.FeatureId, oldBanner.Content, oldBanner.IsActive, bannerId)
 	if err != nil {
+		tx.Rollback()
 		return errors.Wrap(err, fmt.Sprintf("BannerRepo.UpdateBanner: %s", err.Error()))
 	}
 
-	return nil
+	return tx.Commit()
 }

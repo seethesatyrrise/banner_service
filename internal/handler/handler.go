@@ -31,5 +31,9 @@ func (h *Handler) Route(e *echo.Echo) {
 	banner.PATCH("/:banner_id", h.updateBanner)
 	banner.DELETE("/:banner_id", h.deleteBanner)
 
+	bannerHistory := e.Group("/banner_history")
+	bannerHistory.GET("/:banner_id", h.getBannerHistory)
+	//bannerHistory.POST("/:banner_id", h.selectBannerVersion)
+
 	//e.GET("/swagger/*", echoSwagger.WrapHandler)
 }

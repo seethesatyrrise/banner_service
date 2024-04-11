@@ -16,7 +16,7 @@ type UserBanner struct {
 }
 
 type BannerId struct {
-	BannerId int `param:"banner_id"`
+	BannerId int `json:"banner_id" param:"banner_id"`
 }
 
 type BannerFilters struct {
@@ -45,4 +45,19 @@ type OldBanner struct {
 	FeatureId int     `json:"feature_id" db:"feature_id"`
 	Content   []byte  `json:"content" db:"content"`
 	IsActive  bool    `json:"is_active" db:"is_active"`
+}
+
+type BannerVersion struct {
+	Version   int                    `json:"version"`
+	TagIds    []int64                `json:"tag_ids" db:"tag_ids"`
+	FeatureId int                    `json:"feature_id" db:"feature_id"`
+	Content   map[string]interface{} `json:"content" db:"content"`
+	IsActive  bool                   `json:"is_active" db:"is_active"`
+}
+
+const VersionsCount = 3
+
+type BannerHistory struct {
+	BannerId int                          `json:"banner_id" param:"banner_id"`
+	Versions [VersionsCount]BannerVersion `json:"versions"`
 }
