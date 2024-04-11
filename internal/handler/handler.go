@@ -33,7 +33,7 @@ func (h *Handler) Route(e *echo.Echo) {
 
 	bannerHistory := e.Group("/banner_history")
 	bannerHistory.GET("/:banner_id", h.getBannerHistory)
-	//bannerHistory.POST("/:banner_id", h.selectBannerVersion)
+	bannerHistory.POST("/:banner_id", h.setBannerVersion)
 
 	//e.GET("/swagger/*", echoSwagger.WrapHandler)
 }

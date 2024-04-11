@@ -21,6 +21,7 @@ type UserBanner interface {
 
 type BannerHistory interface {
 	GetBannerHistory(ctx context.Context, id int) (entity.BannerHistory, error)
+	SetBannerVersion(ctx context.Context, id, version int) error
 }
 
 type Service struct {

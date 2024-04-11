@@ -1,6 +1,9 @@
 package entity
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type Banner struct {
 	TagIds    []int64                `json:"tag_ids" db:"tag_ids"`
@@ -47,6 +50,12 @@ type OldBanner struct {
 	IsActive  bool    `json:"is_active" db:"is_active"`
 }
 
+func (old *OldBanner) Equals(other OldBanner) bool {
+	oldByte, _ := json.Marshal(old)
+	otherByte, _ := json.Marshal(other)
+	return string(oldByte) == string(otherByte)
+}
+
 type BannerVersion struct {
 	Version   int                    `json:"version"`
 	TagIds    []int64                `json:"tag_ids" db:"tag_ids"`
@@ -55,9 +64,7 @@ type BannerVersion struct {
 	IsActive  bool                   `json:"is_active" db:"is_active"`
 }
 
-const VersionsCount = 3
-
 type BannerHistory struct {
-	BannerId int                          `json:"banner_id" param:"banner_id"`
-	Versions [VersionsCount]BannerVersion `json:"versions"`
+	BannerId int             `json:"banner_id" param:"banner_id"`
+	Versions []BannerVersion `json:"versions"`
 }

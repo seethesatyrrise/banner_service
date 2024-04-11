@@ -17,3 +17,7 @@ func NewBannerHistoryService(repo repo.BannerHistory) *BannerHistoryService {
 func (s *BannerHistoryService) GetBannerHistory(ctx context.Context, id int) (entity.BannerHistory, error) {
 	return s.repo.GetBannerHistory(ctx, id)
 }
+
+func (s *BannerHistoryService) SetBannerVersion(ctx context.Context, id, version int) error {
+	return s.repo.SetBannerVersion(ctx, id, version)
+}
