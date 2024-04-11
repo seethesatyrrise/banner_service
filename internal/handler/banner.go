@@ -81,3 +81,31 @@ func (h *Handler) filterBanners(ctx echo.Context) error {
 
 	return responseOk(ctx, bannersInfo)
 }
+
+func (h *Handler) updateBanner(ctx echo.Context) error {
+	err := h.checkAdminAuthorization(ctx.Request().Header.Get("Authorization"))
+	if err != nil {
+		utils.Logger.Error("incorrect auth data", zap.String("error", err.Error()))
+		return err
+	}
+
+	bannerPatch := make(map[string]interface{}, 0)
+
+	if err := ctx.Bind(&bannerPatch); err != nil {
+		utils.Logger.Error("incorrect data", zap.String("error", err.Error()))
+		return responseErr(errors.Wrap(utils.ErrBadRequest, "incorrect data"))
+	}
+
+	if len(bannerPatch) <= 1 {
+		utils.Logger.Error("incorrect data: nothing to update")
+		return responseErr(errors.Wrap(utils.ErrBadRequest, "incorrect data: nothing to update"))
+	}
+
+	err = h.services.UpdateBanner(ctx.Request().Context(), bannerPatch)
+	if err != nil {
+		utils.Logger.Error("banner filtration error", zap.String("error", err.Error()))
+		return responseErr(err)
+	}
+
+	return responseOk(ctx, "ok")
+}

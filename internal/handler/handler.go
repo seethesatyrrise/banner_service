@@ -28,7 +28,7 @@ func (h *Handler) Route(e *echo.Echo) {
 	banner := e.Group("/banner")
 	banner.GET("/", h.filterBanners)
 	banner.POST("/", h.createBanner)
-	//banner.PATCH("/:id", h.updateBanner)
+	banner.PATCH("/:banner_id", h.updateBanner)
 	banner.DELETE("/:banner_id", h.deleteBanner)
 
 	//e.GET("/swagger/*", echoSwagger.WrapHandler)

@@ -31,8 +31,6 @@ func responseErr(err error) *echo.HTTPError {
 	switch errors.Cause(err) {
 	case utils.ErrNotFound:
 		return echo.NewHTTPError(http.StatusNotFound, err)
-	case utils.ErrAlreadyExists:
-		return echo.NewHTTPError(http.StatusConflict, err)
 	case utils.ErrBadRequest:
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	case utils.ErrAccessDenied:

@@ -3,7 +3,7 @@ package entity
 import "time"
 
 type Banner struct {
-	TagIds    []int                  `json:"tag_ids" db:"tag_ids"`
+	TagIds    []int64                `json:"tag_ids" db:"tag_ids"`
 	FeatureId int                    `json:"feature_id" db:"feature_id"`
 	Content   map[string]interface{} `json:"content" db:"content"`
 	IsActive  bool                   `json:"is_active" db:"is_active"`
@@ -38,4 +38,11 @@ type BannerInfo struct {
 
 type BannerContent struct {
 	Content []byte `db:"content"`
+}
+
+type OldBanner struct {
+	TagIds    []int64 `json:"tag_ids" db:"tag_ids"`
+	FeatureId int     `json:"feature_id" db:"feature_id"`
+	Content   []byte  `json:"content" db:"content"`
+	IsActive  bool    `json:"is_active" db:"is_active"`
 }

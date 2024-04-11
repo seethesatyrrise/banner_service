@@ -93,3 +93,47 @@ func (r *BannerRepo) FilterBanners(ctx context.Context, params entity.BannerFilt
 
 	return banners, nil
 }
+
+func (r *BannerRepo) UpdateBanner(ctx context.Context, patch map[string]interface{}) error {
+	bannerId, ok := patch["banner_id"]
+	if !ok {
+		return errors.New(fmt.Sprintf("BannerRepo.UpdateBanner: no id"))
+	}
+
+	oldBannerQuery := `SELECT tag_ids, feature_id, content, is_active FROM banners WHERE banner_id = $1`
+	row := r.db.QueryRowContext(ctx, oldBannerQuery, bannerId)
+
+	var oldBanner entity.OldBanner
+	if err := row.Scan(pq.Array(&oldBanner.TagIds), &oldBanner.FeatureId, &oldBanner.Content, &oldBanner.IsActive); err != nil {
+		return errors.Wrap(err, fmt.Sprintf("BannerRepo.UpdateBanner: %s", err.Error()))
+	}
+
+	//todo add banner to history
+
+	if content, ok := patch["content"]; ok {
+		contentJSON, err := json.Marshal(content)
+		if err != nil {
+			return errors.Wrap(err, fmt.Sprintf("BannerRepo.UpdateBanner: %s", err.Error()))
+		}
+		oldBanner.Content = contentJSON
+		delete(patch, "content")
+	}
+	patchJSON, err := json.Marshal(patch)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("BannerRepo.UpdateBanner: %s", err.Error()))
+	}
+
+	err = json.Unmarshal(patchJSON, &oldBanner)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("BannerRepo.UpdateBanner: %s", err.Error()))
+	}
+
+	bannerQuery := `UPDATE banners SET tag_ids = $1, feature_id = $2, content = $3, is_active = $4, updated_at = NOW() 
+               		WHERE banner_id = $5`
+	_, err = r.db.ExecContext(ctx, bannerQuery, pq.Array(oldBanner.TagIds), oldBanner.FeatureId, oldBanner.Content, oldBanner.IsActive, bannerId)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("BannerRepo.UpdateBanner: %s", err.Error()))
+	}
+
+	return nil
+}

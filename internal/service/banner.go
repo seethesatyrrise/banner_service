@@ -25,3 +25,7 @@ func (s *BannerService) DeleteBanner(ctx context.Context, id int) error {
 func (s *BannerService) FilterBanners(ctx context.Context, params entity.BannerFilters) ([]entity.BannerInfo, error) {
 	return s.repo.FilterBanners(ctx, params)
 }
+
+func (s *BannerService) UpdateBanner(ctx context.Context, patch map[string]interface{}) error {
+	return s.repo.UpdateBanner(ctx, patch)
+}
