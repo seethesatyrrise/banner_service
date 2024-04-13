@@ -38,23 +38,6 @@ func (r *BannerRepo) CreateBanner(ctx context.Context, banner entity.Banner) (in
 	return bannerId, nil
 }
 
-func (r *BannerRepo) DeleteBanner(ctx context.Context, id int) error {
-	deleteQuery := `DELETE FROM banners WHERE banner_id = $1;`
-
-	res, err := r.db.ExecContext(ctx, deleteQuery, id)
-	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("BannerRepo.DeleteBanner: %s", err.Error()))
-	}
-
-	rowsDeleted, _ := res.RowsAffected()
-	if rowsDeleted == 0 {
-		return errors.Wrap(utils.ErrNotFound, fmt.Sprintf("BannerRepo.DeleteBanner: no banners for id %d", id))
-	}
-	utils.Logger.Info(fmt.Sprintf("BannerRepo.DeleteBanner: delete %d rows from banners table", rowsDeleted))
-
-	return nil
-}
-
 func (r *BannerRepo) FilterBanners(ctx context.Context, params entity.BannerFilters) ([]entity.BannerInfo, error) {
 
 	filterQuery := `SELECT *  FROM banners

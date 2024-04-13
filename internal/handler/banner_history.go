@@ -10,12 +10,7 @@ import (
 )
 
 func (h *Handler) getBannerHistory(ctx echo.Context) error {
-	err := h.checkAdminAuthorization(ctx.Request().Header.Get("Authorization"))
-	if err != nil {
-		utils.Logger.Error("incorrect auth data", zap.String("error", err.Error()))
-		return err
-	}
-
+	var err error
 	var bannerId entity.BannerId
 
 	if err := ctx.Bind(&bannerId); err != nil {
@@ -33,14 +28,9 @@ func (h *Handler) getBannerHistory(ctx echo.Context) error {
 }
 
 func (h *Handler) setBannerVersion(ctx echo.Context) error {
-	err := h.checkAdminAuthorization(ctx.Request().Header.Get("Authorization"))
-	if err != nil {
-		utils.Logger.Error("incorrect auth data", zap.String("error", err.Error()))
-		return err
-	}
-
 	var id entity.BannerId
 	var version int
+	var err error
 
 	if err := ctx.Bind(&id); err != nil {
 		utils.Logger.Error("incorrect data", zap.String("error", err.Error()))

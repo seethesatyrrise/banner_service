@@ -18,10 +18,6 @@ func (s *BannerService) CreateBanner(ctx context.Context, banner entity.Banner) 
 	return s.repo.CreateBanner(ctx, banner)
 }
 
-func (s *BannerService) DeleteBanner(ctx context.Context, id int) error {
-	return s.repo.DeleteBanner(ctx, id)
-}
-
 func (s *BannerService) FilterBanners(ctx context.Context, params entity.BannerFilters) ([]entity.BannerInfo, error) {
 	return s.repo.FilterBanners(ctx, params)
 }

@@ -9,11 +9,7 @@ import (
 )
 
 func (h *Handler) getBanner(ctx echo.Context) error {
-	err := h.checkUserAuthorization(ctx.Request().Header.Get("Authorization"))
-	if err != nil {
-		utils.Logger.Error("incorrect auth data", zap.String("error", err.Error()))
-		return err
-	}
+	var err error
 	var banner entity.UserBanner
 
 	if err := ctx.Bind(&banner); err != nil {

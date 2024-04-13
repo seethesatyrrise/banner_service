@@ -9,12 +9,6 @@ import (
 )
 
 func (h *Handler) createBanner(ctx echo.Context) error {
-	err := h.checkAdminAuthorization(ctx.Request().Header.Get("Authorization"))
-	if err != nil {
-		utils.Logger.Error("incorrect auth data", zap.String("error", err.Error()))
-		return err
-	}
-
 	var banner entity.Banner
 
 	if err := ctx.Bind(&banner); err != nil {
@@ -36,36 +30,7 @@ func (h *Handler) createBanner(ctx echo.Context) error {
 	return responseCreated(ctx, ResponseId{BannerId: id})
 }
 
-func (h *Handler) deleteBanner(ctx echo.Context) error {
-	err := h.checkAdminAuthorization(ctx.Request().Header.Get("Authorization"))
-	if err != nil {
-		utils.Logger.Error("incorrect auth data", zap.String("error", err.Error()))
-		return err
-	}
-
-	var bannerId entity.BannerId
-
-	if err := ctx.Bind(&bannerId); err != nil {
-		utils.Logger.Error("incorrect data", zap.String("error", err.Error()))
-		return responseErr(errors.Wrap(utils.ErrBadRequest, "incorrect data"))
-	}
-
-	err = h.services.DeleteBanner(ctx.Request().Context(), bannerId.BannerId)
-	if err != nil {
-		utils.Logger.Error("banner deletion error", zap.String("error", err.Error()))
-		return responseErr(err)
-	}
-
-	return responseDeleted(ctx, "banner was deleted")
-}
-
 func (h *Handler) filterBanners(ctx echo.Context) error {
-	err := h.checkAdminAuthorization(ctx.Request().Header.Get("Authorization"))
-	if err != nil {
-		utils.Logger.Error("incorrect auth data", zap.String("error", err.Error()))
-		return err
-	}
-
 	var queryParams entity.BannerFilters
 
 	if err := ctx.Bind(&queryParams); err != nil {
@@ -83,12 +48,7 @@ func (h *Handler) filterBanners(ctx echo.Context) error {
 }
 
 func (h *Handler) updateBanner(ctx echo.Context) error {
-	err := h.checkAdminAuthorization(ctx.Request().Header.Get("Authorization"))
-	if err != nil {
-		utils.Logger.Error("incorrect auth data", zap.String("error", err.Error()))
-		return err
-	}
-
+	var err error
 	bannerPatch := make(map[string]interface{}, 0)
 
 	if err := ctx.Bind(&bannerPatch); err != nil {

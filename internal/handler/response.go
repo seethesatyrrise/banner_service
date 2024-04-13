@@ -23,10 +23,6 @@ func responseCreated(ctx echo.Context, data interface{}) error {
 	return ctx.JSON(http.StatusCreated, data)
 }
 
-func responseDeleted(ctx echo.Context, data interface{}) error {
-	return ctx.JSON(http.StatusNoContent, data)
-}
-
 func responseErr(err error) *echo.HTTPError {
 	switch errors.Cause(err) {
 	case utils.ErrNotFound:

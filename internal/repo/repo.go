@@ -10,7 +10,6 @@ type Banner interface {
 	CreateBanner(ctx context.Context, banner entity.Banner) (int, error)
 	FilterBanners(ctx context.Context, params entity.BannerFilters) ([]entity.BannerInfo, error)
 	UpdateBanner(ctx context.Context, patch map[string]interface{}) error
-	DeleteBanner(ctx context.Context, id int) error
 }
 
 type UserBanner interface {
@@ -22,10 +21,15 @@ type BannerHistory interface {
 	SetBannerVersion(ctx context.Context, id, version int) error
 }
 
+type Deletion interface {
+	DeleteFromDB(ctx context.Context, data entity.Deletion) error
+}
+
 type Repository struct {
 	Banner
 	UserBanner
 	BannerHistory
+	Deletion
 }
 
 func New(db *sqlx.DB) *Repository {
@@ -33,5 +37,6 @@ func New(db *sqlx.DB) *Repository {
 		Banner:        NewBanner(db),
 		UserBanner:    NewUserBanner(db),
 		BannerHistory: NewBannerHistory(db),
+		Deletion:      NewDeletion(db),
 	}
 }

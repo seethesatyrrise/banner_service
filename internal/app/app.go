@@ -4,6 +4,7 @@ import (
 	"bannerService/internal/cache"
 	"bannerService/internal/config"
 	"bannerService/internal/database"
+	"bannerService/internal/deletion"
 	"bannerService/internal/handler"
 	"bannerService/internal/repo"
 	"bannerService/internal/service"
@@ -15,13 +16,15 @@ import (
 )
 
 type App struct {
-	db     *database.DB
-	cache  *cache.Cache
-	router *echo.Echo
-	cfg    *config.Config
+	db                 *database.DB
+	cache              *cache.Cache
+	deletionQueue      *deletion.DeletionQueue
+	deletionWorkerQuit chan struct{}
+	router             *echo.Echo
+	cfg                *config.Config
 }
 
-func New() (app *App, err error) {
+func New(deletionWorkerQuit chan struct{}) (app *App, err error) {
 
 	app = &App{}
 
@@ -39,12 +42,14 @@ func New() (app *App, err error) {
 
 	app.cache = cache.New()
 
+	app.deletionQueue = deletion.CreateQueue()
+
 	log.Info("database connected")
 
 	app.router = echo.New()
 
 	repos := repo.New(app.db.DB)
-	services := service.New(repos, app.cache)
+	services := service.New(repos, app.cache, app.deletionQueue, app.deletionWorkerQuit)
 	handlers := handler.New(services, &app.cfg.Tokens)
 
 	handlers.Route(app.router)
