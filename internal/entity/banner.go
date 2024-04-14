@@ -23,6 +23,7 @@ type BannerId struct {
 }
 
 type BannerFilters struct {
+	BannerId  int `query:"banner_id" db:"banner_id"`
 	TagId     int `query:"tag_id" db:"tag_id"`
 	FeatureId int `query:"feature_id" db:"feature_id"`
 	Limit     int `query:"limit" db:"limit"`

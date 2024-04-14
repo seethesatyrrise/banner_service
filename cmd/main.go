@@ -16,8 +16,7 @@ func main() {
 	utils.CreateLogger()
 	defer utils.Logger.Sync()
 
-	deletionWorkerChan := make(chan struct{}, 1)
-	app, err := app.New(deletionWorkerChan)
+	app, err := app.New()
 	if err != nil {
 		utils.Logger.Fatal("init app err", zap.String("error", err.Error()))
 	}
@@ -29,8 +28,6 @@ func main() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 	<-quit
-	deletionWorkerChan <- struct{}{}
-	<-deletionWorkerChan
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 

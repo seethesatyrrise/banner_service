@@ -21,9 +21,10 @@ type App struct {
 	deletionQueue *deletion.DeletionQueue
 	router        *echo.Echo
 	cfg           *config.Config
+	services      *service.Service
 }
 
-func New(deletionWorkerQuit chan struct{}) (app *App, err error) {
+func New() (app *App, err error) {
 
 	app = &App{}
 
@@ -48,8 +49,8 @@ func New(deletionWorkerQuit chan struct{}) (app *App, err error) {
 	app.router = echo.New()
 
 	repos := repo.New(app.db.DB)
-	services := service.New(repos, app.cache, app.deletionQueue, deletionWorkerQuit)
-	handlers := handler.New(services, &app.cfg.Tokens)
+	app.services = service.New(repos, app.cache, app.deletionQueue)
+	handlers := handler.New(app.services, &app.cfg.Tokens)
 
 	handlers.Route(app.router)
 
@@ -64,6 +65,8 @@ func (app *App) Run() error {
 }
 
 func (app *App) Shutdown(ctx context.Context) error {
-
+	if err := app.services.Close(); err != nil {
+		return err
+	}
 	return app.router.Shutdown(ctx)
 }

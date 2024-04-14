@@ -18,7 +18,7 @@ func (h *Handler) deleteId(ctx echo.Context) error {
 
 	h.services.AddIdToDeletionQueue(ctx.Request().Context(), bannerId.BannerId)
 
-	return responseOk(ctx, "id was added to deletion queue")
+	return responseOk(ctx, ResponseMessage{"id was added to deletion queue"})
 }
 
 func (h *Handler) deleteFeature(ctx echo.Context) error {
@@ -36,7 +36,7 @@ func (h *Handler) deleteFeature(ctx echo.Context) error {
 
 	h.services.AddFeatureToDeletionQueue(ctx.Request().Context(), feature.FeatureId)
 
-	return responseOk(ctx, "feature was added to deletion queue")
+	return responseOk(ctx, ResponseMessage{"feature was added to deletion queue"})
 }
 
 func (h *Handler) deleteTag(ctx echo.Context) error {
@@ -54,5 +54,5 @@ func (h *Handler) deleteTag(ctx echo.Context) error {
 
 	h.services.AddTagToDeletionQueue(ctx.Request().Context(), tag.TagId)
 
-	return responseOk(ctx, "tag was added to deletion queue")
+	return responseOk(ctx, ResponseMessage{"tag was added to deletion queue"})
 }

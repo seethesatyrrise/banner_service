@@ -52,5 +52,5 @@ func (h *Handler) setBannerVersion(ctx echo.Context) error {
 		return responseErr(err)
 	}
 
-	return responseOk(ctx, "ok")
+	return responseOk(ctx, ResponseMessage{"ok"})
 }

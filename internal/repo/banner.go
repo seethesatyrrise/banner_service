@@ -41,10 +41,10 @@ func (r *BannerRepo) CreateBanner(ctx context.Context, banner entity.Banner) (in
 func (r *BannerRepo) FilterBanners(ctx context.Context, params entity.BannerFilters) ([]entity.BannerInfo, error) {
 
 	filterQuery := `SELECT *  FROM banners
-					WHERE ($1 = 0 OR $1 = ANY (tag_ids)) AND ($2 = 0 OR $2 = feature_id)
-					LIMIT (CASE WHEN $3 > 0 THEN $3 END) OFFSET $4`
+					WHERE (CASE WHEN $1 > 0 THEN $1 = banner_id ELSE ($2 = 0 OR $2 = ANY (tag_ids)) AND ($3 = 0 OR $3 = feature_id) END)
+					LIMIT (CASE WHEN $4 > 0 THEN $4 END) OFFSET $5`
 
-	rows, err := r.db.QueryContext(ctx, filterQuery, params.TagId, params.FeatureId, params.Limit, params.Offset)
+	rows, err := r.db.QueryContext(ctx, filterQuery, params.BannerId, params.TagId, params.FeatureId, params.Limit, params.Offset)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("BannerRepo.FilterBanners: %s", err.Error()))
 	}

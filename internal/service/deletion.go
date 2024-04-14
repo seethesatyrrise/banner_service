@@ -8,33 +8,37 @@ import (
 )
 
 type DeletionService struct {
-	repo               repo.Deletion
-	queue              *deletion.DeletionQueue
-	deletionWorkerQuit chan struct{}
+	repo      repo.Deletion
+	queue     *deletion.DeletionQueue
+	closeChan chan struct{}
 }
 
-func NewDeletionService(repo repo.Deletion, queue *deletion.DeletionQueue, deletionWorkerChan chan struct{}) *DeletionService {
+func NewDeletionService(repo repo.Deletion, queue *deletion.DeletionQueue) *DeletionService {
 	s := &DeletionService{
-		repo:  repo,
-		queue: queue,
+		repo:      repo,
+		queue:     queue,
+		closeChan: make(chan struct{}, 1),
 	}
 
-	go s.DeletionWorker(context.Background(), deletionWorkerChan)
+	go s.DeletionWorker(context.Background())
 
 	return s
 }
 
-func (s *DeletionService) DeletionWorker(ctx context.Context, deletionWorkerChan chan struct{}) {
+func (s *DeletionService) DeletionWorker(ctx context.Context) {
 	for {
 		select {
-		case <-deletionWorkerChan:
-			s.repo.DeleteFromDB(ctx, s.queue.GetDeletionDataAndClearQueue())
-			break
+		case <-s.closeChan:
+			return
 		case <-time.After(10 * time.Second):
 			s.repo.DeleteFromDB(ctx, s.queue.GetDeletionDataAndClearQueue())
 		}
 	}
-	deletionWorkerChan <- struct{}{}
+}
+
+func (s *DeletionService) Close() error {
+	close(s.closeChan)
+	return s.repo.DeleteFromDB(context.Background(), s.queue.GetDeletionDataAndClearQueue())
 }
 
 func (s *DeletionService) AddFeatureToDeletionQueue(ctx context.Context, featureId int) {

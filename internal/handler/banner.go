@@ -67,5 +67,5 @@ func (h *Handler) updateBanner(ctx echo.Context) error {
 		return responseErr(err)
 	}
 
-	return responseOk(ctx, "ok")
+	return responseOk(ctx, ResponseMessage{"ok"})
 }

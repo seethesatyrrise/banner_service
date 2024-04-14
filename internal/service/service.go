@@ -29,6 +29,7 @@ type Deletion interface {
 	AddFeatureToDeletionQueue(ctx context.Context, featureId int)
 	AddTagToDeletionQueue(ctx context.Context, tagId int)
 	AddIdToDeletionQueue(ctx context.Context, id int)
+	Close() error
 }
 
 type Service struct {
@@ -38,11 +39,15 @@ type Service struct {
 	Deletion
 }
 
-func New(repo *repo.Repository, cache *cache.Cache, queue *deletion.DeletionQueue, deletionWorkerChan chan struct{}) *Service {
+func New(repo *repo.Repository, cache *cache.Cache, queue *deletion.DeletionQueue) *Service {
 	return &Service{
 		Banner:        NewBannerService(repo),
 		UserBanner:    NewUserBannerService(repo, cache),
 		BannerHistory: NewBannerHistoryService(repo),
-		Deletion:      NewDeletionService(repo, queue, deletionWorkerChan),
+		Deletion:      NewDeletionService(repo, queue),
 	}
+}
+
+func (s *Service) Close() error {
+	return s.Deletion.Close()
 }
