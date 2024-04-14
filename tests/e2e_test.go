@@ -156,3 +156,91 @@ func Test_VersionsHistory(t *testing.T) {
 	assert.Equal(t, bannerFromHistory.TagIds, resultedBanner.TagIds)
 	assert.Equal(t, bannerFromHistory.IsActive, resultedBanner.IsActive)
 }
+
+func Test_FilterAndDeletion(t *testing.T) {
+	cfg, db, router := setupTest()
+	defer finishTest(db)
+
+	createBannersTable(db)
+
+	// Create 3 banners
+	for _, bannerBody := range filterCreateBanner {
+		w := httptest.NewRecorder()
+		req := httptest.NewRequest("POST", fmt.Sprintf("/banner/"),
+			bytes.NewBufferString(bannerBody))
+		req.Header.Set(echo.HeaderAuthorization, cfg.Tokens.Admin)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		router.ServeHTTP(w, req)
+	}
+
+	// Filter all
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/banner/", nil)
+	req.Header.Set(echo.HeaderAuthorization, cfg.Tokens.Admin)
+	router.ServeHTTP(w, req)
+
+	data, err := io.ReadAll(w.Result().Body)
+	if err != nil {
+		utils.Logger.Error("FilterAndDeletion test error: " + err.Error())
+		os.Exit(1)
+	}
+
+	var filterAll []entity.BannerInfo
+	err = json.Unmarshal(data, &filterAll)
+	if err != nil {
+		utils.Logger.Error("FilterAndDeletion test error: " + err.Error())
+		os.Exit(1)
+	}
+
+	assert.Equal(t, len(filterAll), len(filterCreateBanner))
+
+	// Filter by tag_id = 6
+	w = httptest.NewRecorder()
+	req = httptest.NewRequest("GET", "/banner/?tag_id=6", nil)
+	req.Header.Set(echo.HeaderAuthorization, cfg.Tokens.Admin)
+	router.ServeHTTP(w, req)
+
+	data, err = io.ReadAll(w.Result().Body)
+	if err != nil {
+		utils.Logger.Error("FilterAndDeletion test error: " + err.Error())
+		os.Exit(1)
+	}
+
+	var filterByTag []entity.BannerInfo
+	err = json.Unmarshal(data, &filterByTag)
+	if err != nil {
+		utils.Logger.Error("FilterAndDeletion test error: " + err.Error())
+		os.Exit(1)
+	}
+
+	assert.Equal(t, len(filterByTag), 2)
+
+	// Delete by feature_id = 11
+	w = httptest.NewRecorder()
+	req = httptest.NewRequest("DELETE", "/delete/feature/11", nil)
+	req.Header.Set(echo.HeaderAuthorization, cfg.Tokens.Admin)
+	router.ServeHTTP(w, req)
+
+	time.Sleep(11 * time.Second)
+
+	// Filter all
+	w = httptest.NewRecorder()
+	req = httptest.NewRequest("GET", "/banner/", nil)
+	req.Header.Set(echo.HeaderAuthorization, cfg.Tokens.Admin)
+	router.ServeHTTP(w, req)
+
+	data, err = io.ReadAll(w.Result().Body)
+	if err != nil {
+		utils.Logger.Error("FilterAndDeletion test error: " + err.Error())
+		os.Exit(1)
+	}
+
+	var filterAllAgain []entity.BannerInfo
+	err = json.Unmarshal(data, &filterAllAgain)
+	if err != nil {
+		utils.Logger.Error("FilterAndDeletion test error: " + err.Error())
+		os.Exit(1)
+	}
+
+	assert.Equal(t, len(filterAllAgain), 1)
+}
