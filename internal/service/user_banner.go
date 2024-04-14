@@ -7,7 +7,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
 )
 
 type UserBannerService struct {
@@ -32,7 +31,8 @@ func (s *UserBannerService) GetBanner(ctx context.Context, banner entity.UserBan
 		if err != nil {
 			return nil, err
 		}
-		err = s.cache.Cache.SetNX(ctx, key, content, 5*time.Minute).Err()
+		s.cache.Cache.Del(ctx, key)
+		err = s.cache.Cache.SetNX(ctx, key, content, cache.TTL).Err()
 		if err != nil {
 			return nil, err
 		}

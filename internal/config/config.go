@@ -22,9 +22,15 @@ type Tokens struct {
 	Admin string `env:"ADMIN_TOKEN" env-default:"admin_token"`
 }
 
+type Cache struct {
+	Host string `env:"REDIS_HOST" env-default:"redis"`
+	Port string `env:"REDIS_PORT" env-default:"6379"`
+}
+
 type Config struct {
 	HTTP
 	DB
+	Cache
 	Tokens
 }
 

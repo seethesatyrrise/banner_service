@@ -16,12 +16,11 @@ import (
 )
 
 type App struct {
-	db                 *database.DB
-	cache              *cache.Cache
-	deletionQueue      *deletion.DeletionQueue
-	deletionWorkerQuit chan struct{}
-	router             *echo.Echo
-	cfg                *config.Config
+	db            *database.DB
+	cache         *cache.Cache
+	deletionQueue *deletion.DeletionQueue
+	router        *echo.Echo
+	cfg           *config.Config
 }
 
 func New(deletionWorkerQuit chan struct{}) (app *App, err error) {
@@ -40,7 +39,7 @@ func New(deletionWorkerQuit chan struct{}) (app *App, err error) {
 		return nil, errors.Wrap(err, "database connection err")
 	}
 
-	app.cache = cache.New()
+	app.cache = cache.New(&app.cfg.Cache)
 
 	app.deletionQueue = deletion.CreateQueue()
 
@@ -49,7 +48,7 @@ func New(deletionWorkerQuit chan struct{}) (app *App, err error) {
 	app.router = echo.New()
 
 	repos := repo.New(app.db.DB)
-	services := service.New(repos, app.cache, app.deletionQueue, app.deletionWorkerQuit)
+	services := service.New(repos, app.cache, app.deletionQueue, deletionWorkerQuit)
 	handlers := handler.New(services, &app.cfg.Tokens)
 
 	handlers.Route(app.router)

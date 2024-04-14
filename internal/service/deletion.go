@@ -3,7 +3,6 @@ package service
 import (
 	"bannerService/internal/deletion"
 	"bannerService/internal/repo"
-	"bannerService/internal/utils"
 	"context"
 	"time"
 )
@@ -35,7 +34,6 @@ func (s *DeletionService) DeletionWorker(ctx context.Context, deletionWorkerChan
 			s.repo.DeleteFromDB(ctx, s.queue.GetDeletionDataAndClearQueue())
 		}
 	}
-	utils.Logger.Info("quitting deletion worker")
 	deletionWorkerChan <- struct{}{}
 }
 

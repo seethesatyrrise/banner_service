@@ -19,7 +19,6 @@ func NewDeletion(db *sqlx.DB) *DeletionRepo {
 }
 
 func (r *DeletionRepo) DeleteFromDB(ctx context.Context, data entity.Deletion) error {
-	utils.Logger.Info(fmt.Sprintf("DeletionRepo.DeleteFromDB: deletion started"))
 	deleteQuery := `DELETE FROM banners WHERE banner_id = ANY($1) OR feature_id = ANY($2) OR (tag_ids && $3);`
 
 	res, err := r.db.ExecContext(ctx, deleteQuery, pq.Array(data.Ids), pq.Array(data.Features), pq.Array(data.Tags))
